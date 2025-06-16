@@ -1,0 +1,1813 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.361">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Introducción al Análisis Demográfico con R - 1&nbsp; 1. Revisión de fuentes de datos demográficos y su importación en R</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./P2.html" rel="next">
+<link href="./index.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./P1.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">1. Revisión de fuentes de datos demográficos y su importación en R</span></a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Introducción al Análisis Demográfico con R</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/aniuxa/r_ad_somede2025" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <a href="./Introducción-al-Análisis-Demográfico-con-R.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sobre el curso</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./P1.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">1. Revisión de fuentes de datos demográficos y su importación en R</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./P2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Evaluación de información y pirámides</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./P3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Lexis</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./P4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Tasas</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./P5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Migración y flujos</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#instalación-de-paquetes-en-desarrollo" id="toc-instalación-de-paquetes-en-desarrollo" class="nav-link active" data-scroll-target="#instalación-de-paquetes-en-desarrollo"><span class="header-section-number">1.1</span> Instalación de paquetes en desarrollo</a></li>
+  <li><a href="#dataframes-con-el-paquete-wdi" id="toc-dataframes-con-el-paquete-wdi" class="nav-link" data-scroll-target="#dataframes-con-el-paquete-wdi"><span class="header-section-number">1.2</span> Dataframes con el paquete <code>{WDI}</code></a></li>
+  <li><a href="#importación-de-datos" id="toc-importación-de-datos" class="nav-link" data-scroll-target="#importación-de-datos"><span class="header-section-number">1.3</span> Importación de datos</a>
+  <ul class="collapse">
+  <li><a href="#desde-excel" id="toc-desde-excel" class="nav-link" data-scroll-target="#desde-excel"><span class="header-section-number">1.3.1</span> Desde Excel</a></li>
+  <li><a href="#desde-archivos-de-texto-y-de-una-url" id="toc-desde-archivos-de-texto-y-de-una-url" class="nav-link" data-scroll-target="#desde-archivos-de-texto-y-de-una-url"><span class="header-section-number">1.3.2</span> Desde archivos de texto y de una url</a></li>
+  <li><a href="#wpp2024" id="toc-wpp2024" class="nav-link" data-scroll-target="#wpp2024"><span class="header-section-number">1.3.3</span> <code>{wpp2024}</code></a></li>
+  </ul></li>
+  <li><a href="#de-ipums" id="toc-de-ipums" class="nav-link" data-scroll-target="#de-ipums"><span class="header-section-number">1.4</span> De IPUMS</a></li>
+  <li><a href="#fmsb-atracción-digital" id="toc-fmsb-atracción-digital" class="nav-link" data-scroll-target="#fmsb-atracción-digital"><span class="header-section-number">1.5</span> <code>{fmsb}</code> Atracción digital</a>
+  <ul class="collapse">
+  <li><a href="#momento-de-práctica" id="toc-momento-de-práctica" class="nav-link" data-scroll-target="#momento-de-práctica"><span class="header-section-number">1.5.1</span> Momento de práctica</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/aniuxa/r_ad_somede2025/edit/main/P1.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/aniuxa/r_ad_somede2025/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">1. Revisión de fuentes de datos demográficos y su importación en R</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(<span class="st">"pacman"</span>)) <span class="fu">install.packages</span>(<span class="st">"pacman"</span>) <span class="co"># instala pacman si se requiere</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Cargando paquete requerido: pacman</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(tidyverse,</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>               readxl, </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>               writexl,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>               haven, </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>               foreign,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>               WDI, </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>               remotes) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="instalación-de-paquetes-en-desarrollo" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="instalación-de-paquetes-en-desarrollo"><span class="header-section-number">1.1</span> Instalación de paquetes en desarrollo</h2>
+<p>Además de los paquetes que están en CRAN, hay otros repositorios desde los cuáles podemos instalar el código. Un paquete que utilizaremos mucho, es el paquete <code>{wpp2024}</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"PPgp/wpp2024"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Skipping install of 'wpp2024' from a github remote, the SHA1 (bac89293) has not changed since last install.
+  Use `force = TRUE` to force installation</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(wpp2024)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Cargando paquete requerido: data.table</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'data.table' was built under R version 4.4.1</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Adjuntando el paquete: 'data.table'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:lubridate':
+
+    hour, isoweek, mday, minute, month, quarter, second, wday, week,
+    yday, year</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:dplyr':
+
+    between, first, last</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:purrr':
+
+    transpose</code></pre>
+</div>
+</div>
+</section>
+<section id="dataframes-con-el-paquete-wdi" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="dataframes-con-el-paquete-wdi"><span class="header-section-number">1.2</span> Dataframes con el paquete <code>{WDI}</code></h2>
+<p>Instalamos anteriormente el paquete <code>{WDI}</code> que nos da acceso a un grupo amplio de bases de datos que nos ayudaran a revisar y analizar algunas técnicas sencillas.</p>
+<blockquote class="blockquote">
+<p>El Banco Mundial pone a disposición una gran cantidad de datos excelentes de los Indicadores de Desarrollo Mundial a través de su API web. El paquete WDI para R facilita la búsqueda y descarga de series de datos desde WDI”.</p>
+</blockquote>
+<p>Para saber un poco más de esta librería:</p>
+<ul>
+<li><p><a href="https://cran.r-project.org/web/packages/WDI/WDI.pdf" class="uri">https://cran.r-project.org/web/packages/WDI/WDI.pdf</a></p></li>
+<li><p><a href="https://www.r-project.org/nosvn/pandoc/WDI.html" class="uri">https://www.r-project.org/nosvn/pandoc/WDI.html</a></p></li>
+<li><p><a href="https://databank.worldbank.org/reports.aspx?source=2&amp;country=ARE" class="uri">https://databank.worldbank.org/reports.aspx?source=2&amp;country=ARE</a></p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>WDI<span class="sc">::</span><span class="fu">WDIsearch</span>(<span class="st">'gender'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                      indicator
+169                                 2.3_GIR.GPI
+172                                 2.6_PCR.GPI
+709                           5.51.01.07.gender
+1573                       BI.EMP.PWRK.PB.FE.ZS
+1575                       BI.EMP.PWRK.PB.MA.ZS
+1587                       BI.EMP.TOTL.PB.FE.ZS
+1589                       BI.EMP.TOTL.PB.MA.ZS
+1712                          BI.WAG.PREM.PB.FE
+1716                          BI.WAG.PREM.PB.FM
+1717                       BI.WAG.PREM.PB.FM.ED
+1718                       BI.WAG.PREM.PB.FM.HE
+1719                       BI.WAG.PREM.PB.FM.PA
+1723                          BI.WAG.PREM.PB.MA
+1735                       BI.WAG.PREM.PV.FM.ED
+1736                       BI.WAG.PREM.PV.FM.HE
+1737                          BI.WAG.PRVS.ED.FM
+1740                          BI.WAG.PRVS.HE.FM
+1744                          BI.WAG.PUBS.ED.FM
+1747                          BI.WAG.PUBS.HE.FM
+1748                          BI.WAG.PUBS.PA.FM
+2202                                CC.ESG.AGFE
+2203                                CC.ESG.AGMA
+2204                                CC.ESG.CMFE
+2205                                CC.ESG.CMMA
+2206                                CC.ESG.CNFE
+2207                                CC.ESG.CNMA
+2208                                CC.ESG.EUFE
+2209                                CC.ESG.EUMA
+2210                                CC.ESG.FBFE
+2211                                CC.ESG.FBMA
+2212                                CC.ESG.INFE
+2213                                CC.ESG.INMA
+2214                                CC.ESG.MAFE
+2215                                CC.ESG.MAMA
+2216                                CC.ESG.MIFE
+2217                                CC.ESG.MIMA
+2218                                CC.ESG.OSFE
+2219                                CC.ESG.OSMA
+2220                                CC.ESG.PAFE
+2221                                CC.ESG.PAMA
+2222                                CC.ESG.PSFE
+2223                                CC.ESG.PSMA
+2224                                CC.ESG.SEFE
+2225                                CC.ESG.SEMA
+2226                                CC.ESG.TCFE
+2227                                CC.ESG.TCMA
+2296                                CC.ISG.FFFE
+2297                                CC.ISG.FFMA
+2298                                CC.ISG.NAFE
+2299                                CC.ISG.NAMA
+2300                                CC.ISG.NBFE
+2301                                CC.ISG.NBMA
+6251                       FB.FCP.BREG.PR.DI.SC
+8632  IC.REG.PRRT.LNDADM.GEN.XD.030.DB1719.DFRN
+8904                             IQ.CPA.GNDR.XQ
+9755                                JI.WAG.GNDR
+9756                             JI.WAG.GNDR.HE
+9757                             JI.WAG.GNDR.LE
+9758                             JI.WAG.GNDR.OL
+9759                             JI.WAG.GNDR.RU
+9760                             JI.WAG.GNDR.UR
+9761                             JI.WAG.GNDR.YG
+14651                          PRJ.MYS.15UP.GPI
+14667                          PRJ.MYS.25UP.GPI
+15164                      SE.ADT.1524.LT.FM.ZS
+15175                         SE.ENR.PRIM.FM.ZS
+15177                         SE.ENR.PRSC.FM.ZS
+15178                         SE.ENR.SECO.FM.ZS
+15180                         SE.ENR.TERT.FM.ZS
+15998                            SG.LAW.CRDD.GR
+16011                            SG.LAW.NODC.HR
+16027                               SG.NOD.CONS
+17766                             SPI.D3.5.GEND
+18119                      UIS.AIR.1.GLAST.GPIA
+18120                  UIS.AIR.2.GPV.GLAST.GPIA
+18129                             UIS.CR.1.GPIA
+18137                          UIS.CR.1.Q1.GPIA
+18144                          UIS.CR.1.Q2.GPIA
+18151                          UIS.CR.1.Q3.GPIA
+18158                          UIS.CR.1.Q4.GPIA
+18165                          UIS.CR.1.Q5.GPIA
+18172                         UIS.CR.1.RUR.GPIA
+18177                      UIS.CR.1.RUR.Q1.GPIA
+18181                      UIS.CR.1.RUR.Q2.GPIA
+18185                      UIS.CR.1.RUR.Q3.GPIA
+18189                      UIS.CR.1.RUR.Q4.GPIA
+18193                      UIS.CR.1.RUR.Q5.GPIA
+18199                         UIS.CR.1.URB.GPIA
+18204                      UIS.CR.1.URB.Q1.GPIA
+18208                      UIS.CR.1.URB.Q2.GPIA
+18212                      UIS.CR.1.URB.Q3.GPIA
+18216                      UIS.CR.1.URB.Q4.GPIA
+18220                      UIS.CR.1.URB.Q5.GPIA
+18228                             UIS.CR.2.GPIA
+18236                          UIS.CR.2.Q1.GPIA
+18243                          UIS.CR.2.Q2.GPIA
+18250                          UIS.CR.2.Q3.GPIA
+18257                          UIS.CR.2.Q4.GPIA
+18264                          UIS.CR.2.Q5.GPIA
+18271                         UIS.CR.2.RUR.GPIA
+18276                      UIS.CR.2.RUR.Q1.GPIA
+18280                      UIS.CR.2.RUR.Q2.GPIA
+18284                      UIS.CR.2.RUR.Q3.GPIA
+18288                      UIS.CR.2.RUR.Q4.GPIA
+18292                      UIS.CR.2.RUR.Q5.GPIA
+18298                         UIS.CR.2.URB.GPIA
+18303                      UIS.CR.2.URB.Q1.GPIA
+18307                      UIS.CR.2.URB.Q2.GPIA
+18311                      UIS.CR.2.URB.Q3.GPIA
+18315                      UIS.CR.2.URB.Q4.GPIA
+18319                      UIS.CR.2.URB.Q5.GPIA
+18327                             UIS.CR.3.GPIA
+18335                          UIS.CR.3.Q1.GPIA
+18342                          UIS.CR.3.Q2.GPIA
+18349                          UIS.CR.3.Q3.GPIA
+18356                          UIS.CR.3.Q4.GPIA
+18363                          UIS.CR.3.Q5.GPIA
+18370                         UIS.CR.3.RUR.GPIA
+18375                      UIS.CR.3.RUR.Q1.GPIA
+18379                      UIS.CR.3.RUR.Q2.GPIA
+18383                      UIS.CR.3.RUR.Q3.GPIA
+18387                      UIS.CR.3.RUR.Q4.GPIA
+18391                      UIS.CR.3.RUR.Q5.GPIA
+18397                         UIS.CR.3.URB.GPIA
+18402                      UIS.CR.3.URB.Q1.GPIA
+18406                      UIS.CR.3.URB.Q2.GPIA
+18410                      UIS.CR.3.URB.Q3.GPIA
+18414                      UIS.CR.3.URB.Q4.GPIA
+18418                      UIS.CR.3.URB.Q5.GPIA
+18459                   UIS.EA.1T8.AG25T99.GPIA
+18466                   UIS.EA.2T8.AG25T99.GPIA
+18473                   UIS.EA.3T8.AG25T99.GPIA
+18480                   UIS.EA.4T8.AG25T99.GPIA
+18486                   UIS.EA.5T8.AG25T99.GPIA
+18493                   UIS.EA.6T8.AG25T99.GPIA
+18500                   UIS.EA.7T8.AG25T99.GPIA
+18504                     UIS.EA.8.AG25T99.GPIA
+18517                  UIS.EA.S1T8.AG25T99.GPIA
+18525                UIS.ESG.LOWERSEC.COGN.GPIA
+18528                     UIS.ESG.LOWERSEC.GPIA
+18532            UIS.ESG.LOWERSEC.NCOG.CONF.GPI
+18536            UIS.ESG.LOWERSEC.NCOG.ENJO.GPI
+18540                    UIS.EV1524P.2T5.V.GPIA
+18550                      UIS.FHLANGILP.1.GPIA
+18569                          UIS.GAR.5T8.GPIA
+18577                       UIS.GAR.5T8.Q1.GPIA
+18584                       UIS.GAR.5T8.Q2.GPIA
+18591                       UIS.GAR.5T8.Q3.GPIA
+18598                       UIS.GAR.5T8.Q4.GPIA
+18605                       UIS.GAR.5T8.Q5.GPIA
+18612                      UIS.GAR.5T8.RUR.GPIA
+18617                   UIS.GAR.5T8.RUR.Q1.GPIA
+18621                   UIS.GAR.5T8.RUR.Q2.GPIA
+18625                   UIS.GAR.5T8.RUR.Q3.GPIA
+18629                   UIS.GAR.5T8.RUR.Q4.GPIA
+18633                   UIS.GAR.5T8.RUR.Q5.GPIA
+18639                      UIS.GAR.5T8.URB.GPIA
+18644                   UIS.GAR.5T8.URB.Q1.GPIA
+18648                   UIS.GAR.5T8.URB.Q2.GPIA
+18652                   UIS.GAR.5T8.URB.Q3.GPIA
+18656                   UIS.GAR.5T8.URB.Q4.GPIA
+18660                   UIS.GAR.5T8.URB.Q5.GPIA
+18667                 UIS.GCS.LOWERSEC.COG.GPIA
+18670                     UIS.GCS.LOWERSEC.GPIA
+18674            UIS.GCS.LOWERSEC.NCOG.FREE.GPI
+18676                UIS.GCS.LOWERSEC.NCOG.GEQU
+18677              UIS.GCS.LOWERSEC.NCOG.GEQU.F
+18678            UIS.GCS.LOWERSEC.NCOG.GEQU.GPI
+18679              UIS.GCS.LOWERSEC.NCOG.GEQU.M
+18682            UIS.GCS.LOWERSEC.NCOG.GLOC.GPI
+18686            UIS.GCS.LOWERSEC.NCOG.MULT.GPI
+18690            UIS.GCS.LOWERSEC.NCOG.PEAC.GPI
+18694            UIS.GCS.LOWERSEC.NCOG.SDEV.GPI
+18698            UIS.GCS.LOWERSEC.NCOG.SJUS.GPI
+18702                            UIS.GER.0.GPIA
+18706                           UIS.GER.01.GPIA
+18708                           UIS.GER.02.GPIA
+18711                            UIS.GER.12.GPI
+18717                           UIS.GER.1T6.GPI
+18719                             UIS.GER.2.GPI
+18720                             UIS.GER.3.GPI
+18723                             UIS.GER.4.GPI
+18725                          UIS.GER.5T8.GPIA
+18726                           UIS.GGR.5.A.GPI
+18742                   UIS.ICTSKILLATTACH.GPIA
+18746                   UIS.ICTSKILLCONNEC.GPIA
+18750                     UIS.ICTSKILLCOPI.GPIA
+18754                    UIS.ICTSKILLCREAT.GPIA
+18758                   UIS.ICTSKILLDUPLIC.GPIA
+18762                  UIS.ICTSKILLFORMULA.GPIA
+18766                 UIS.ICTSKILLPROGLANG.GPIA
+18770                 UIS.ICTSKILLSOFTWARE.GPIA
+18774             UIS.ICTSKILLTRANSFERFILE.GPIA
+18793                       UIS.LR.AG15T24.GPIA
+18798                   UIS.LR.AG15T24.RUR.GPIA
+18802                   UIS.LR.AG15T24.URB.GPIA
+18805                       UIS.LR.AG15T99.GPIA
+18810                   UIS.LR.AG15T99.RUR.GPIA
+18814                   UIS.LR.AG15T99.URB.GPIA
+18819                       UIS.LR.AG25T64.GPIA
+18825                   UIS.LR.AG25T64.RUR.GPIA
+18829                   UIS.LR.AG25T64.URB.GPIA
+18835                       UIS.LR.AG65T99.GPIA
+18840                   UIS.LR.AG65T99.RUR.GPIA
+18844                   UIS.LR.AG65T99.URB.GPIA
+18848                        UIS.MATH.G2T3.GPIA
+18864                    UIS.MATH.LOWERSEC.GPIA
+18880                     UIS.MATH.PRIMARY.GPIA
+18907                        UIS.NARA.AGM1.GPIA
+18915                     UIS.NARA.AGM1.Q1.GPIA
+18922                     UIS.NARA.AGM1.Q2.GPIA
+18929                     UIS.NARA.AGM1.Q3.GPIA
+18936                     UIS.NARA.AGM1.Q4.GPIA
+18943                     UIS.NARA.AGM1.Q5.GPIA
+18950                    UIS.NARA.AGM1.RUR.GPIA
+18955                 UIS.NARA.AGM1.RUR.Q1.GPIA
+18959                 UIS.NARA.AGM1.RUR.Q2.GPIA
+18963                 UIS.NARA.AGM1.RUR.Q3.GPIA
+18967                 UIS.NARA.AGM1.RUR.Q4.GPIA
+18971                 UIS.NARA.AGM1.RUR.Q5.GPIA
+18977                    UIS.NARA.AGM1.URB.GPIA
+18982                 UIS.NARA.AGM1.URB.Q1.GPIA
+18986                 UIS.NARA.AGM1.URB.Q2.GPIA
+18990                 UIS.NARA.AGM1.URB.Q3.GPIA
+18994                 UIS.NARA.AGM1.URB.Q4.GPIA
+18998                 UIS.NARA.AGM1.URB.Q5.GPIA
+19006                           UIS.NART.1.GPIA
+19014                        UIS.NART.1.Q1.GPIA
+19021                        UIS.NART.1.Q2.GPIA
+19028                        UIS.NART.1.Q3.GPIA
+19035                        UIS.NART.1.Q4.GPIA
+19042                        UIS.NART.1.Q5.GPIA
+19049                       UIS.NART.1.RUR.GPIA
+19054                    UIS.NART.1.RUR.Q1.GPIA
+19058                    UIS.NART.1.RUR.Q2.GPIA
+19062                    UIS.NART.1.RUR.Q3.GPIA
+19066                    UIS.NART.1.RUR.Q4.GPIA
+19070                    UIS.NART.1.RUR.Q5.GPIA
+19076                       UIS.NART.1.URB.GPIA
+19081                    UIS.NART.1.URB.Q1.GPIA
+19085                    UIS.NART.1.URB.Q2.GPIA
+19089                    UIS.NART.1.URB.Q3.GPIA
+19093                    UIS.NART.1.URB.Q4.GPIA
+19097                    UIS.NART.1.URB.Q5.GPIA
+19105                           UIS.NART.2.GPIA
+19113                        UIS.NART.2.Q1.GPIA
+19120                        UIS.NART.2.Q2.GPIA
+19127                        UIS.NART.2.Q3.GPIA
+19134                        UIS.NART.2.Q4.GPIA
+19141                        UIS.NART.2.Q5.GPIA
+19148                       UIS.NART.2.RUR.GPIA
+19153                    UIS.NART.2.RUR.Q1.GPIA
+19157                    UIS.NART.2.RUR.Q2.GPIA
+19161                    UIS.NART.2.RUR.Q3.GPIA
+19165                    UIS.NART.2.RUR.Q4.GPIA
+19169                    UIS.NART.2.RUR.Q5.GPIA
+19175                       UIS.NART.2.URB.GPIA
+19180                    UIS.NART.2.URB.Q1.GPIA
+19184                    UIS.NART.2.URB.Q2.GPIA
+19188                    UIS.NART.2.URB.Q3.GPIA
+19192                    UIS.NART.2.URB.Q4.GPIA
+19196                    UIS.NART.2.URB.Q5.GPIA
+19204                           UIS.NART.3.GPIA
+19212                        UIS.NART.3.Q1.GPIA
+19219                        UIS.NART.3.Q2.GPIA
+19226                        UIS.NART.3.Q3.GPIA
+19233                        UIS.NART.3.Q4.GPIA
+19240                        UIS.NART.3.Q5.GPIA
+19247                       UIS.NART.3.RUR.GPIA
+19252                    UIS.NART.3.RUR.Q1.GPIA
+19256                    UIS.NART.3.RUR.Q2.GPIA
+19260                    UIS.NART.3.RUR.Q3.GPIA
+19264                    UIS.NART.3.RUR.Q4.GPIA
+19268                    UIS.NART.3.RUR.Q5.GPIA
+19274                       UIS.NART.3.URB.GPIA
+19279                    UIS.NART.3.URB.Q1.GPIA
+19283                    UIS.NART.3.URB.Q2.GPIA
+19287                    UIS.NART.3.URB.Q3.GPIA
+19291                    UIS.NART.3.URB.Q4.GPIA
+19295                    UIS.NART.3.URB.Q5.GPIA
+19301                     UIS.NERA.AGM1.GPIA.CP
+19305                            UIS.NERT.1.GPI
+19309                            UIS.NERT.2.GPI
+19313                            UIS.NERT.3.GPI
+19317                          UIS.OAEPG.1.GPIA
+19321                      UIS.OAEPG.2.GPV.GPIA
+19346            UIS.ONTRACK.THREE.DOMAINS.GPIA
+19350                UIS.PER.11T15.BULLIED.GPIA
+19363                       UIS.POSTIMUENV.GPIA
+19378                         UIS.PRYA.12MO.GPI
+19392                          UIS.QUTP.02.GPIA
+19396                           UIS.QUTP.1.GPIA
+19400                           UIS.QUTP.2.GPIA
+19404                         UIS.QUTP.2T3.GPIA
+19408                           UIS.QUTP.3.GPIA
+19463                        UIS.READ.G2T3.GPIA
+19479                    UIS.READ.LOWERSEC.GPIA
+19495                     UIS.READ.PRIMARY.GPIA
+19553                       UIS.ROFST.1.GPIA.CP
+19557                     UIS.ROFST.1T2.GPIA.CP
+19561                     UIS.ROFST.1T3.GPIA.CP
+19565                       UIS.ROFST.2.GPIA.CP
+19569                     UIS.ROFST.2T3.GPIA.CP
+19573                       UIS.ROFST.3.GPIA.CP
+19577                    UIS.ROFST.AGM1.GPIA.CP
+19583                        UIS.ROFST.H.1.GPIA
+19591                     UIS.ROFST.H.1.Q1.GPIA
+19598                     UIS.ROFST.H.1.Q2.GPIA
+19605                     UIS.ROFST.H.1.Q3.GPIA
+19612                     UIS.ROFST.H.1.Q4.GPIA
+19619                     UIS.ROFST.H.1.Q5.GPIA
+19626                    UIS.ROFST.H.1.RUR.GPIA
+19631                 UIS.ROFST.H.1.RUR.Q1.GPIA
+19635                 UIS.ROFST.H.1.RUR.Q2.GPIA
+19639                 UIS.ROFST.H.1.RUR.Q3.GPIA
+19643                 UIS.ROFST.H.1.RUR.Q4.GPIA
+19647                 UIS.ROFST.H.1.RUR.Q5.GPIA
+19653                    UIS.ROFST.H.1.URB.GPIA
+19658                 UIS.ROFST.H.1.URB.Q1.GPIA
+19662                 UIS.ROFST.H.1.URB.Q2.GPIA
+19666                 UIS.ROFST.H.1.URB.Q3.GPIA
+19670                 UIS.ROFST.H.1.URB.Q4.GPIA
+19674                 UIS.ROFST.H.1.URB.Q5.GPIA
+19682                        UIS.ROFST.H.2.GPIA
+19690                     UIS.ROFST.H.2.Q1.GPIA
+19697                     UIS.ROFST.H.2.Q2.GPIA
+19704                     UIS.ROFST.H.2.Q3.GPIA
+19711                     UIS.ROFST.H.2.Q4.GPIA
+19718                     UIS.ROFST.H.2.Q5.GPIA
+19725                    UIS.ROFST.H.2.RUR.GPIA
+19730                 UIS.ROFST.H.2.RUR.Q1.GPIA
+19734                 UIS.ROFST.H.2.RUR.Q2.GPIA
+19738                 UIS.ROFST.H.2.RUR.Q3.GPIA
+19742                 UIS.ROFST.H.2.RUR.Q4.GPIA
+19746                 UIS.ROFST.H.2.RUR.Q5.GPIA
+19752                    UIS.ROFST.H.2.URB.GPIA
+19757                 UIS.ROFST.H.2.URB.Q1.GPIA
+19761                 UIS.ROFST.H.2.URB.Q2.GPIA
+19765                 UIS.ROFST.H.2.URB.Q3.GPIA
+19769                 UIS.ROFST.H.2.URB.Q4.GPIA
+19773                 UIS.ROFST.H.2.URB.Q5.GPIA
+19781                        UIS.ROFST.H.3.GPIA
+19789                     UIS.ROFST.H.3.Q1.GPIA
+19796                     UIS.ROFST.H.3.Q2.GPIA
+19803                     UIS.ROFST.H.3.Q3.GPIA
+19810                     UIS.ROFST.H.3.Q4.GPIA
+19817                     UIS.ROFST.H.3.Q5.GPIA
+19824                    UIS.ROFST.H.3.RUR.GPIA
+19829                 UIS.ROFST.H.3.RUR.Q1.GPIA
+19833                 UIS.ROFST.H.3.RUR.Q2.GPIA
+19837                 UIS.ROFST.H.3.RUR.Q3.GPIA
+19841                 UIS.ROFST.H.3.RUR.Q4.GPIA
+19845                 UIS.ROFST.H.3.RUR.Q5.GPIA
+19851                    UIS.ROFST.H.3.URB.GPIA
+19856                 UIS.ROFST.H.3.URB.Q1.GPIA
+19860                 UIS.ROFST.H.3.URB.Q2.GPIA
+19864                 UIS.ROFST.H.3.URB.Q3.GPIA
+19868                 UIS.ROFST.H.3.URB.Q4.GPIA
+19872                 UIS.ROFST.H.3.URB.Q5.GPIA
+19925                            UIS.SLE.02.GPI
+19929                             UIS.SLE.1.GPI
+19936                           UIS.SLE.123.GPI
+19938                           UIS.SLE.1T2.GPI
+19939                           UIS.SLE.1T6.GPI
+19942                            UIS.SLE.23.GPI
+19946                             UIS.SLE.4.GPI
+19950                            UIS.SLE.56.GPI
+19954                           UIS.SR.1.G4.GPI
+19956                           UIS.SR.1.G5.GPI
+19957                        UIS.SR.1.GLAST.GPI
+19979                        UIS.TATTRR.02.GPIA
+19982                         UIS.TATTRR.1.GPIA
+19986                         UIS.TATTRR.2.GPIA
+19991                       UIS.TATTRR.2T3.GPIA
+20000                         UIS.TATTRR.3.GPIA
+20014                          UIS.TRTP.02.GPIA
+20016                           UIS.TRTP.1.GPIA
+20019                           UIS.TRTP.2.GPIA
+20021                         UIS.TRTP.2T3.GPIA
+20024                           UIS.TRTP.3.GPIA
+20143             UIS.YADULT.PROFILITERACY.GPIA
+20153             UIS.YADULT.PROFINUMERACY.GPIA
+                                                                                                                                                                                                                                       name
+169                                                                                                                                                                                   Gender parity index for gross intake ratio in grade 1
+172                                                                                                                                                                                        Gender parity index for primary completion rate 
+709                                                                                                                                                                                                                         Gender equality
+1573                                                                                                                                                              Public sector employment, as a share of paid employment by gender: Female
+1575                                                                                                                                                                Public sector employment, as a share of paid employment by gender: Male
+1587                                                                                                                                                             Public sector employment, as a share of total employment by gender: Female
+1589                                                                                                                                                               Public sector employment, as a share of total employment by gender: Male
+1712                                                                                                                                                      Public sector wage premium, by gender: Female (compared to all private employees)
+1716                                                                                                                                                     P-Value: Public sector wage premium, by gender (compared to all private employees)
+1717                                                                                                                            P-Value: Gender wage premium in the public sector, by industry: Education (compared to male paid employees)
+1718                                                                                                                               P-Value: Gender wage premium in the public sector, by industry: Health (compared to male paid employees)
+1719                                                                                                                 P-Value: Gender wage premium in the public sector, by industry: Public adminstration (compared to male paid employees)
+1723                                                                                                                                                        Public sector wage premium, by gender: Male (compared to all private employees)
+1735                                                                                                                           P-Value: Gender wage premium in the private sector, by industry: Education (compared to male paid employees)
+1736                                                                                                                              P-Value: Gender wage premium in the private sector, by industry: Health (compared to male paid employees)
+1737                                                                                                                                    Gender wage premium in the private sector, by industry: Education (compared to male paid employees)
+1740                                                                                                                                       Gender wage premium in the private sector, by industry: Health (compared to male paid employees)
+1744                                                                                                                                     Gender wage premium in the public sector, by industry: Education (compared to male paid employees)
+1747                                                                                                                                        Gender wage premium in the public sector, by industry: Health (compared to male paid employees)
+1748                                                                                                                          Gender wage premium in the public sector, by industry: Public adminstration (compared to male paid employees)
+2202                                                                                                                                                                    Employment by sector and gender (% of total) - Agriculture - Female
+2203                                                                                                                                                                      Employment by sector and gender (% of total) - Agriculture - Male
+2204                                                                                                                                                                       Employment by sector and gender (% of total) - Commerce - Female
+2205                                                                                                                                                                         Employment by sector and gender (% of total) - Commerce - Male
+2206                                                                                                                                                                   Employment by sector and gender (% of total) - Construction - Female
+2207                                                                                                                                                                     Employment by sector and gender (% of total) - Construction - Male
+2208                                                                                                                                                      Employment by sector and gender (% of total) - Electricity and utilities - Female
+2209                                                                                                                                                        Employment by sector and gender (% of total) - Electricity and utilities - Male
+2210                                                                                                                                                Employment by sector and gender (% of total) - Financial and Business Services - Female
+2211                                                                                                                                                  Employment by sector and gender (% of total) - Financial and Business Services - Male
+2212                                                                                                                                                                       Employment by sector and gender (% of total) - Industry - Female
+2213                                                                                                                                                                         Employment by sector and gender (% of total) - Industry - Male
+2214                                                                                                                                                                  Employment by sector and gender (% of total) - Manufacturing - Female
+2215                                                                                                                                                                    Employment by sector and gender (% of total) - Manufacturing - Male
+2216                                                                                                                                                                         Employment by sector and gender (% of total) - Mining - Female
+2217                                                                                                                                                                           Employment by sector and gender (% of total) - Mining - Male
+2218                                                                                                                                                                 Employment by sector and gender (% of total) - Other services - Female
+2219                                                                                                                                                                   Employment by sector and gender (% of total) - Other services - Male
+2220                                                                                                                                                          Employment by sector and gender (% of total) - Public Administration - Female
+2221                                                                                                                                                            Employment by sector and gender (% of total) - Public Administration - Male
+2222                                                                                                                                                       Employment by sector and gender (% of total) - Public sector employment - Female
+2223                                                                                                                                                         Employment by sector and gender (% of total) - Public sector employment - Male
+2224                                                                                                                                                                       Employment by sector and gender (% of total) - Services - Female
+2225                                                                                                                                                                         Employment by sector and gender (% of total) - Services - Male
+2226                                                                                                                                                      Employment by sector and gender (% of total) - Transport &amp; Communication - Female
+2227                                                                                                                                                        Employment by sector and gender (% of total) - Transport &amp; Communication - Male
+2296                                                                                                                                     Informal employment by sector and gender (% of total) - Agriculture, forestry and fishing - Female
+2297                                                                                                                                       Informal employment by sector and gender (% of total) - Agriculture, forestry and fishing - Male
+2298                                                                                                                                                       Informal employment by sector and gender (% of total) - Non-agriculture - Female
+2299                                                                                                                                                         Informal employment by sector and gender (% of total) - Non-agriculture - Male
+2300                                                                                                                                                          Informal employment by sector and gender (% of total) - No breakdown - Female
+2301                                                                                                                                                            Informal employment by sector and gender (% of total) - No breakdown - Male
+6251                                                                          589_Do laws and regulations prohibit or restrict discriminating consumers based on gender, ethnicity, faith, political affiliation, or appearance?  _#VHGA_03
+8632                                                                                                                            Registering property: Quality of land administration index with Gender (0-30) (DB17-19 methodology) - Score
+8904                                                                                                                                                                                          CPIA gender equality rating (1=low to 6=high)
+9755                                                                                                                                                                                      Female to male gender wage gap, aged 15-64, total
+9756                                                                                                                                                                    Female to male gender wage gap, aged 15-64, above primary education
+9757                                                                                                                                                                Female to male gender wage gap, aged 15-64, primary education and below
+9758                                                                                                                                                                                             Female to male gender wage gap, aged 25-64
+9759                                                                                                                                                                                      Female to male gender wage gap, aged 15-64, rural
+9760                                                                                                                                                                                      Female to male gender wage gap, aged 15-64, urban
+9761                                                                                                                                                                                             Female to male gender wage gap, aged 15-24
+14651                                                                                                                                                                 Wittgenstein Projection: Mean Years of Schooling. Age 15+. Gender Gap
+14667                                                                                                                                                                 Wittgenstein Projection: Mean Years of Schooling. Age 25+. Gender Gap
+15164                                                                                                                                                                          Literacy rate, youth (ages 15-24), gender parity index (GPI)
+15175                                                                                                                                                                         School enrollment, primary (gross), gender parity index (GPI)
+15177                                                                                                                                                           School enrollment, primary and secondary (gross), gender parity index (GPI)
+15178                                                                                                                                                                       School enrollment, secondary (gross), gender parity index (GPI)
+15180                                                                                                                                                                        School enrollment, tertiary (gross), gender parity index (GPI)
+15998                                                                                                                                                    The law prohibits discrimination in access to credit based on gender (1=yes; 0=no)
+16011                                                                                                                                                          The law prohibits discrimination in employment based on gender (1=yes; 0=no)
+16027                                                                                                                                                            Nondiscrimination clause mentions gender in the constitution (1=yes; 0=no)
+17766                                                                                                                                                                                       GOAL 5: Gender Equality (5 year moving average)
+18119                                                                                                                                        Gross intake ratio to the last grade of primary education, adjusted gender parity index (GPIA)
+18120                                                                                                                        Gross intake ratio to the last grade of lower secondary general education, adjusted gender parity index (GPIA)
+18129                                                                                                                                                               Completion rate, primary education, adjusted gender parity index (GPIA)
+18137                                                                                                                                             Completion rate, primary education, poorest quintile, adjusted gender parity index (GPIA)
+18144                                                                                                                                              Completion rate, primary education, second quintile, adjusted gender parity index (GPIA)
+18151                                                                                                                                              Completion rate, primary education, middle quintile, adjusted gender parity index (GPIA)
+18158                                                                                                                                              Completion rate, primary education, fourth quintile, adjusted gender parity index (GPIA)
+18165                                                                                                                                             Completion rate, primary education, richest quintile, adjusted gender parity index (GPIA)
+18172                                                                                                                                                        Completion rate, primary education, rural, adjusted gender parity index (GPIA)
+18177                                                                                                                                      Completion rate, primary education, rural, poorest quintile, adjusted gender parity index (GPIA)
+18181                                                                                                                                       Completion rate, primary education, rural, second quintile, adjusted gender parity index (GPIA)
+18185                                                                                                                                       Completion rate, primary education, rural, middle quintile, adjusted gender parity index (GPIA)
+18189                                                                                                                                       Completion rate, primary education, rural, fourth quintile, adjusted gender parity index (GPIA)
+18193                                                                                                                                      Completion rate, primary education, rural, richest quintile, adjusted gender parity index (GPIA)
+18199                                                                                                                                                        Completion rate, primary education, urban, adjusted gender parity index (GPIA)
+18204                                                                                                                                      Completion rate, primary education, urban, poorest quintile, adjusted gender parity index (GPIA)
+18208                                                                                                                                       Completion rate, primary education, urban, second quintile, adjusted gender parity index (GPIA)
+18212                                                                                                                                       Completion rate, primary education, urban, middle quintile, adjusted gender parity index (GPIA)
+18216                                                                                                                                       Completion rate, primary education, urban, fourth quintile, adjusted gender parity index (GPIA)
+18220                                                                                                                                      Completion rate, primary education, urban, richest quintile, adjusted gender parity index (GPIA)
+18228                                                                                                                                                       Completion rate, lower secondary education, adjusted gender parity index (GPIA)
+18236                                                                                                                                     Completion rate, lower secondary education, poorest quintile, adjusted gender parity index (GPIA)
+18243                                                                                                                                      Completion rate, lower secondary education, second quintile, adjusted gender parity index (GPIA)
+18250                                                                                                                                      Completion rate, lower secondary education, middle quintile, adjusted gender parity index (GPIA)
+18257                                                                                                                                      Completion rate, lower secondary education, fourth quintile, adjusted gender parity index (GPIA)
+18264                                                                                                                                     Completion rate, lower secondary education, richest quintile, adjusted gender parity index (GPIA)
+18271                                                                                                                                                Completion rate, lower secondary education, rural, adjusted gender parity index (GPIA)
+18276                                                                                                                              Completion rate, lower secondary education, rural, poorest quintile, adjusted gender parity index (GPIA)
+18280                                                                                                                               Completion rate, lower secondary education, rural, second quintile, adjusted gender parity index (GPIA)
+18284                                                                                                                               Completion rate, lower secondary education, rural, middle quintile, adjusted gender parity index (GPIA)
+18288                                                                                                                               Completion rate, lower secondary education, rural, fourth quintile, adjusted gender parity index (GPIA)
+18292                                                                                                                              Completion rate, lower secondary education, rural, richest quintile, adjusted gender parity index (GPIA)
+18298                                                                                                                                                Completion rate, lower secondary education, urban, adjusted gender parity index (GPIA)
+18303                                                                                                                              Completion rate, lower secondary education, urban, poorest quintile, adjusted gender parity index (GPIA)
+18307                                                                                                                               Completion rate, lower secondary education, urban, second quintile, adjusted gender parity index (GPIA)
+18311                                                                                                                               Completion rate, lower secondary education, urban, middle quintile, adjusted gender parity index (GPIA)
+18315                                                                                                                               Completion rate, lower secondary education, urban, fourth quintile, adjusted gender parity index (GPIA)
+18319                                                                                                                              Completion rate, lower secondary education, urban, richest quintile, adjusted gender parity index (GPIA)
+18327                                                                                                                                                       Completion rate, upper secondary education, adjusted gender parity index (GPIA)
+18335                                                                                                                                     Completion rate, upper secondary education, poorest quintile, adjusted gender parity index (GPIA)
+18342                                                                                                                                      Completion rate, upper secondary education, second quintile, adjusted gender parity index (GPIA)
+18349                                                                                                                                      Completion rate, upper secondary education, middle quintile, adjusted gender parity index (GPIA)
+18356                                                                                                                                      Completion rate, upper secondary education, fourth quintile, adjusted gender parity index (GPIA)
+18363                                                                                                                                     Completion rate, upper secondary education, richest quintile, adjusted gender parity index (GPIA)
+18370                                                                                                                                                Completion rate, upper secondary education, rural, adjusted gender parity index (GPIA)
+18375                                                                                                                              Completion rate, upper secondary education, rural, poorest quintile, adjusted gender parity index (GPIA)
+18379                                                                                                                               Completion rate, upper secondary education, rural, second quintile, adjusted gender parity index (GPIA)
+18383                                                                                                                               Completion rate, upper secondary education, rural, middle quintile, adjusted gender parity index (GPIA)
+18387                                                                                                                               Completion rate, upper secondary education, rural, fourth quintile, adjusted gender parity index (GPIA)
+18391                                                                                                                              Completion rate, upper secondary education, rural, richest quintile, adjusted gender parity index (GPIA)
+18397                                                                                                                                                Completion rate, upper secondary education, urban, adjusted gender parity index (GPIA)
+18402                                                                                                                              Completion rate, upper secondary education, urban, poorest quintile, adjusted gender parity index (GPIA)
+18406                                                                                                                               Completion rate, upper secondary education, urban, second quintile, adjusted gender parity index (GPIA)
+18410                                                                                                                               Completion rate, upper secondary education, urban, middle quintile, adjusted gender parity index (GPIA)
+18414                                                                                                                               Completion rate, upper secondary education, urban, fourth quintile, adjusted gender parity index (GPIA)
+18418                                                                                                                              Completion rate, upper secondary education, urban, richest quintile, adjusted gender parity index (GPIA)
+18459                                                                                              UIS: Percentage of population age 25+ with at least completed primary education (ISCED 1 or higher). Adjusted Gender Parity Index (GPIA)
+18466                                                                                      UIS: Percentage of population age 25+ with at least completed lower secondary education (ISCED 2 or higher). Adjusted Gender Parity Index (GPIA)
+18473                                                                                      UIS: Percentage of population age 25+ with at least completed upper secondary education (ISCED 3 or higher). Adjusted Gender Parity Index (GPIA)
+18480                                                                                       UIS: Percentage of population age 25+ with at least completed post-secondary education (ISCED 4 or higher). Adjusted Gender Parity Index (GPIA)
+18486                                                                                  UIS: Percentage of population age 25+ with at least a completed short-cycle tertiary degree (ISCED 5 or higher). Adjusted Gender Parity Index (GPIA)
+18493                                                                              UIS: Percentage of population age 25+ with at least a completed bachelor's or equivalent degree (ISCED 6 or higher). Adjusted Gender Parity Index (GPIA)
+18500                                                                                UIS: Percentage of population age 25+ with at least a completed master's degree or equivalent (ISCED 7 or higher). Adjusted Gender Parity Index (GPIA)
+18504                                                                                                             UIS: Percentage of population age 25+ with a doctoral degree or equivalent (ISCED 8). Adjusted Gender Parity Index (GPIA)
+18517                                                                                                                       UIS: Percentage of population age 25+ with at least some primary (ISCED 1). Adjusted Gender Parity Index (GPIA)
+18525                                                Percentage of students in lower secondary education showing proficiency in knowledge of environmental science and geoscience‚ Cognitive dimension‚ adjusted gender parity index (GPIA)
+18528                                                                     Percentage of students in lower secondary education showing proficiency in knowledge of environmental science and geoscience‚ adjusted gender parity index (GPIA)
+18532                                Percentage of students in lower secondary education showing proficiency in knowledge of environmental science and geoscience‚ Non-cognitive dimension‚ Confidence‚ adjusted gender parity index (GPIA)
+18536                                 Percentage of students in lower secondary education showing proficiency in knowledge of environmental science and geoscience‚ Non-cognitive dimension‚ Enjoyment‚ adjusted gender parity index (GPIA)
+18540                                                                                                                                   Proportion of 15-24 year-olds enrolled in vocational education, adjusted gender parity index (GPIA)
+18550                                                                                     Percentage of students in primary education who have their first or home language as language of instruction, adjusted gender parity index (GPIA)
+18569                                                                                                                                                    Gross attendance ratio for tertiary education, adjusted gender parity index (GPIA)
+18577                                                                                                                                  Gross attendance ratio for tertiary education, poorest quintile, adjusted gender parity index (GPIA)
+18584                                                                                                                                   Gross attendance ratio for tertiary education, second quintile, adjusted gender parity index (GPIA)
+18591                                                                                                                                   Gross attendance ratio for tertiary education, middle quintile, adjusted gender parity index (GPIA)
+18598                                                                                                                                   Gross attendance ratio for tertiary education, fourth quintile, adjusted gender parity index (GPIA)
+18605                                                                                                                                  Gross attendance ratio for tertiary education, richest quintile, adjusted gender parity index (GPIA)
+18612                                                                                                                                             Gross attendance ratio for tertiary education, rural, adjusted gender parity index (GPIA)
+18617                                                                                                                           Gross attendance ratio for tertiary education, rural, poorest quintile, adjusted gender parity index (GPIA)
+18621                                                                                                                            Gross attendance ratio for tertiary education, rural, second quintile, adjusted gender parity index (GPIA)
+18625                                                                                                                            Gross attendance ratio for tertiary education, rural, middle quintile, adjusted gender parity index (GPIA)
+18629                                                                                                                            Gross attendance ratio for tertiary education, rural, fourth quintile, adjusted gender parity index (GPIA)
+18633                                                                                                                           Gross attendance ratio for tertiary education, rural, richest quintile, adjusted gender parity index (GPIA)
+18639                                                                                                                                             Gross attendance ratio for tertiary education, urban, adjusted gender parity index (GPIA)
+18644                                                                                                                           Gross attendance ratio for tertiary education, urban, poorest quintile, adjusted gender parity index (GPIA)
+18648                                                                                                                            Gross attendance ratio for tertiary education, urban, second quintile, adjusted gender parity index (GPIA)
+18652                                                                                                                            Gross attendance ratio for tertiary education, urban, middle quintile, adjusted gender parity index (GPIA)
+18656                                                                                                                            Gross attendance ratio for tertiary education, urban, fourth quintile, adjusted gender parity index (GPIA)
+18660                                                                                                                           Gross attendance ratio for tertiary education, urban, richest quintile, adjusted gender parity index (GPIA)
+18667                              Percentage of students in lower secondary education showing adequate understanding of issues relating to global citizenship and sustainability, Cognitive Dimension, adjusted gender parity index (GPIA)
+18670                                                   Percentage of students in lower secondary education showing adequate understanding of issues relating to global citizenship and sustainability, adjusted gender parity index (GPIA)
+18674                 Percentage of students in lower secondary education showing adequate understanding of issues relating to global citizenship and sustainability‚ Non-cognitive Dimension‚ Freedom, adjusted gender parity index (GPIA)
+18676                              Percentage of students in lower secondary education showing adequate understanding of issues relating to global citizenship and sustainability, Non-cognitive Dimension, Gender equality, both sexes (%)
+18677                                  Percentage of students in lower secondary education showing adequate understanding of issues relating to global citizenship and sustainability, Non-cognitive Dimension, Gender equality, female (%)
+18678         Percentage of students in lower secondary education showing adequate understanding of issues relating to global citizenship and sustainability‚ Non-cognitive Dimension‚ Gender equality, adjusted gender parity index (GPIA)
+18679                                    Percentage of students in lower secondary education showing adequate understanding of issues relating to global citizenship and sustainability, Non-cognitive Dimension, Gender equality, male (%)
+18682   Percentage of students in lower secondary education showing adequate understanding of issues relating to global citizenship and sustainability‚ Non-cognitive Dimension‚ Global-local thinking, adjusted gender parity index (GPIA)
+18686        Percentage of students in lower secondary education showing adequate understanding of issues relating to global citizenship and sustainability‚ Non-cognitive Dimension‚ Multiculturalism, adjusted gender parity index (GPIA)
+18690                   Percentage of students in lower secondary education showing adequate understanding of issues relating to global citizenship and sustainability‚ Non-cognitive Dimension‚ Peace, adjusted gender parity index (GPIA)
+18694 Percentage of students in lower secondary education showing adequate understanding of issues relating to global citizenship and sustainability‚ Non-cognitive Dimension‚ Sustainable development, adjusted gender parity index (GPIA)
+18698          Percentage of students in lower secondary education showing adequate understanding of issues relating to global citizenship and sustainability‚ Non-cognitive Dimension‚ Social Justice, adjusted gender parity index (GPIA)
+18702                                                                                                                                                 Gross enrolment ratio, early childhood education, adjusted gender parity index (GPIA)
+18706                                                                                                                        Gross enrolment ratio, early childhood educational development programmes, adjusted gender parity index (GPIA)
+18708                                                                                                                                                               Gross enrolment ratio, pre-primary, adjusted gender parity index (GPIA)
+18711                                                                                                                                                         Gross enrolment ratio, primary and lower secondary, gender parity index (GPI)
+18717                                                                                                                                                                 Gross enrolment ratio, primary to tertiary, gender parity index (GPI)
+18719                                                                                                                                                                     Gross enrolment ratio, lower secondary, gender parity index (GPI)
+18720                                                                                                                                                                     Gross enrolment ratio, upper secondary, gender parity index (GPI)
+18723                                                                                                                                                         Gross enrolment ratio, post-secondary non-tertiary, gender parity index (GPI)
+18725                                                                                                                                                     Gross enrolment ratio for tertiary education, adjusted gender parity index (GPIA)
+18726                                                                                                                  Gross graduation ratio from first degree programmes (ISCED 6 and 7) in tertiary education, gender parity index (GPI)
+18742                                                                                         Proportion of youth and adults who have sent e-mails with attached files (e.g. document, picture, video), adjusted gender parity index (GPIA)
+18746                                                                                                                      Proportion of youth and adults who have connected and installed new devices, adjusted gender parity index (GPIA)
+18750                                                                                                                         Proportion of youth and adults who have copied or moved a file or folder, adjusted gender parity index (GPIA)
+18754                                                                                              Proportion of youth and adults who have created electronic presentations with presentation software, adjusted gender parity index (GPIA)
+18758                                                                             Proportion of youth and adults who have used copy and paste tools to duplicate or move information within a document, adjusted gender parity index (GPIA)
+18762                                                                                                          Proportion of youth and adults who have used basic arithmetic formulae in a spreadsheet, adjusted gender parity index (GPIA)
+18766                                                                                        Proportion of youth and adults who have wrote a computer program using a specialised programming language, adjusted gender parity index (GPIA)
+18770                                                                                                     Proportion of youth and adults who have found, downloaded, installed and configured software, adjusted gender parity index (GPIA)
+18774                                                                                                   Proportion of youth and adults who have transferred files between a computer and other devices, adjusted gender parity index (GPIA)
+18793                                                                                                                                                      Youth literacy rate, population 15-24 years, adjusted gender parity index (GPIA)
+18798                                                                                                                                               Youth literacy rate, population 15-24 years, rural, adjusted gender parity index (GPIA)
+18802                                                                                                                                               Youth literacy rate, population 15-24 years, urban, adjusted gender parity index (GPIA)
+18805                                                                                                                                                        Adult literacy rate, population 15+ years, adjusted gender parity index (GPIA)
+18810                                                                                                                                                 Adult literacy rate, population 15+ years, rural, adjusted gender parity index (GPIA)
+18814                                                                                                                                                 Adult literacy rate, population 15+ years, urban, adjusted gender parity index (GPIA)
+18819                                                                                                                                                            Literacy rate, population 25-64 years, adjusted gender parity index (GPIA)
+18825                                                                                                                                                     Literacy rate, population 25-64 years, rural, adjusted gender parity index (GPIA)
+18829                                                                                                                                                     Literacy rate, population 25-64 years, urban, adjusted gender parity index (GPIA)
+18835                                                                                                                                                      Elderly literacy rate, population 65+ years, adjusted gender parity index (GPIA)
+18840                                                                                                                                               Elderly literacy rate, population 65+ years, rural, adjusted gender parity index (GPIA)
+18844                                                                                                                                               Elderly literacy rate, population 65+ years, urban, adjusted gender parity index (GPIA)
+18848                                                                                             Proportion of students in Grade 2 or 3 achieving at least a minimum proficiency level in mathematics, adjusted gender parity index (GPIA)
+18864                                                                               Proportion of students at the end of lower secondary achieving at least a minimum proficiency level in mathematics, adjusted gender parity index (GPIA)
+18880                                                                                       Proportion of students at the end of primary achieving at least a minimum proficiency level in mathematics, adjusted gender parity index (GPIA)
+18907                                                                                                                     Adjusted net attendance rate, one year before the official primary entry age, adjusted gender parity index (GPIA)
+18915                                                                                                   Adjusted net attendance rate, one year before the official primary entry age, poorest quintile, adjusted gender parity index (GPIA)
+18922                                                                                                    Adjusted net attendance rate, one year before the official primary entry age, second quintile, adjusted gender parity index (GPIA)
+18929                                                                                                    Adjusted net attendance rate, one year before the official primary entry age, middle quintile, adjusted gender parity index (GPIA)
+18936                                                                                                    Adjusted net attendance rate, one year before the official primary entry age, fourth quintile, adjusted gender parity index (GPIA)
+18943                                                                                                   Adjusted net attendance rate, one year before the official primary entry age, richest quintile, adjusted gender parity index (GPIA)
+18950                                                                                                              Adjusted net attendance rate, one year before the official primary entry age, rural, adjusted gender parity index (GPIA)
+18955                                                                                            Adjusted net attendance rate, one year before the official primary entry age, rural, poorest quintile, adjusted gender parity index (GPIA)
+18959                                                                                             Adjusted net attendance rate, one year before the official primary entry age, rural, second quintile, adjusted gender parity index (GPIA)
+18963                                                                                             Adjusted net attendance rate, one year before the official primary entry age, rural, middle quintile, adjusted gender parity index (GPIA)
+18967                                                                                             Adjusted net attendance rate, one year before the official primary entry age, rural, fourth quintile, adjusted gender parity index (GPIA)
+18971                                                                                            Adjusted net attendance rate, one year before the official primary entry age, rural, richest quintile, adjusted gender parity index (GPIA)
+18977                                                                                                              Adjusted net attendance rate, one year before the official primary entry age, urban, adjusted gender parity index (GPIA)
+18982                                                                                            Adjusted net attendance rate, one year before the official primary entry age, urban, poorest quintile, adjusted gender parity index (GPIA)
+18986                                                                                             Adjusted net attendance rate, one year before the official primary entry age, urban, second quintile, adjusted gender parity index (GPIA)
+18990                                                                                             Adjusted net attendance rate, one year before the official primary entry age, urban, middle quintile, adjusted gender parity index (GPIA)
+18994                                                                                             Adjusted net attendance rate, one year before the official primary entry age, urban, fourth quintile, adjusted gender parity index (GPIA)
+18998                                                                                            Adjusted net attendance rate, one year before the official primary entry age, urban, richest quintile, adjusted gender parity index (GPIA)
+19006                                                                                                                                                               Total net attendance rate, primary, adjusted gender parity index (GPIA)
+19014                                                                                                                                             Total net attendance rate, primary, poorest quintile, adjusted gender parity index (GPIA)
+19021                                                                                                                                              Total net attendance rate, primary, second quintile, adjusted gender parity index (GPIA)
+19028                                                                                                                                              Total net attendance rate, primary, middle quintile, adjusted gender parity index (GPIA)
+19035                                                                                                                                              Total net attendance rate, primary, fourth quintile, adjusted gender parity index (GPIA)
+19042                                                                                                                                             Total net attendance rate, primary, richest quintile, adjusted gender parity index (GPIA)
+19049                                                                                                                                                        Total net attendance rate, primary, rural, adjusted gender parity index (GPIA)
+19054                                                                                                                                      Total net attendance rate, primary, rural, poorest quintile, adjusted gender parity index (GPIA)
+19058                                                                                                                                       Total net attendance rate, primary, rural, second quintile, adjusted gender parity index (GPIA)
+19062                                                                                                                                       Total net attendance rate, primary, rural, middle quintile, adjusted gender parity index (GPIA)
+19066                                                                                                                                       Total net attendance rate, primary, rural, fourth quintile, adjusted gender parity index (GPIA)
+19070                                                                                                                                      Total net attendance rate, primary, rural, richest quintile, adjusted gender parity index (GPIA)
+19076                                                                                                                                                        Total net attendance rate, primary, urban, adjusted gender parity index (GPIA)
+19081                                                                                                                                      Total net attendance rate, primary, urban, poorest quintile, adjusted gender parity index (GPIA)
+19085                                                                                                                                       Total net attendance rate, primary, urban, second quintile, adjusted gender parity index (GPIA)
+19089                                                                                                                                       Total net attendance rate, primary, urban, middle quintile, adjusted gender parity index (GPIA)
+19093                                                                                                                                       Total net attendance rate, primary, urban, fourth quintile, adjusted gender parity index (GPIA)
+19097                                                                                                                                      Total net attendance rate, primary, urban, richest quintile, adjusted gender parity index (GPIA)
+19105                                                                                                                                                       Total net attendance rate, lower secondary, adjusted gender parity index (GPIA)
+19113                                                                                                                                     Total net attendance rate, lower secondary, poorest quintile, adjusted gender parity index (GPIA)
+19120                                                                                                                                      Total net attendance rate, lower secondary, second quintile, adjusted gender parity index (GPIA)
+19127                                                                                                                                      Total net attendance rate, lower secondary, middle quintile, adjusted gender parity index (GPIA)
+19134                                                                                                                                      Total net attendance rate, lower secondary, fourth quintile, adjusted gender parity index (GPIA)
+19141                                                                                                                                     Total net attendance rate, lower secondary, richest quintile, adjusted gender parity index (GPIA)
+19148                                                                                                                                                Total net attendance rate, lower secondary, rural, adjusted gender parity index (GPIA)
+19153                                                                                                                              Total net attendance rate, lower secondary, rural, poorest quintile, adjusted gender parity index (GPIA)
+19157                                                                                                                               Total net attendance rate, lower secondary, rural, second quintile, adjusted gender parity index (GPIA)
+19161                                                                                                                               Total net attendance rate, lower secondary, rural, middle quintile, adjusted gender parity index (GPIA)
+19165                                                                                                                               Total net attendance rate, lower secondary, rural, fourth quintile, adjusted gender parity index (GPIA)
+19169                                                                                                                              Total net attendance rate, lower secondary, rural, richest quintile, adjusted gender parity index (GPIA)
+19175                                                                                                                                                Total net attendance rate, lower secondary, urban, adjusted gender parity index (GPIA)
+19180                                                                                                                              Total net attendance rate, lower secondary, urban, poorest quintile, adjusted gender parity index (GPIA)
+19184                                                                                                                               Total net attendance rate, lower secondary, urban, second quintile, adjusted gender parity index (GPIA)
+19188                                                                                                                               Total net attendance rate, lower secondary, urban, middle quintile, adjusted gender parity index (GPIA)
+19192                                                                                                                               Total net attendance rate, lower secondary, urban, fourth quintile, adjusted gender parity index (GPIA)
+19196                                                                                                                              Total net attendance rate, lower secondary, urban, richest quintile, adjusted gender parity index (GPIA)
+19204                                                                                                                                                       Total net attendance rate, upper secondary, adjusted gender parity index (GPIA)
+19212                                                                                                                                     Total net attendance rate, upper secondary, poorest quintile, adjusted gender parity index (GPIA)
+19219                                                                                                                                      Total net attendance rate, upper secondary, second quintile, adjusted gender parity index (GPIA)
+19226                                                                                                                                      Total net attendance rate, upper secondary, middle quintile, adjusted gender parity index (GPIA)
+19233                                                                                                                                      Total net attendance rate, upper secondary, fourth quintile, adjusted gender parity index (GPIA)
+19240                                                                                                                                     Total net attendance rate, upper secondary, richest quintile, adjusted gender parity index (GPIA)
+19247                                                                                                                                                Total net attendance rate, upper secondary, rural, adjusted gender parity index (GPIA)
+19252                                                                                                                              Total net attendance rate, upper secondary, rural, poorest quintile, adjusted gender parity index (GPIA)
+19256                                                                                                                               Total net attendance rate, upper secondary, rural, second quintile, adjusted gender parity index (GPIA)
+19260                                                                                                                               Total net attendance rate, upper secondary, rural, middle quintile, adjusted gender parity index (GPIA)
+19264                                                                                                                               Total net attendance rate, upper secondary, rural, fourth quintile, adjusted gender parity index (GPIA)
+19268                                                                                                                              Total net attendance rate, upper secondary, rural, richest quintile, adjusted gender parity index (GPIA)
+19274                                                                                                                                                Total net attendance rate, upper secondary, urban, adjusted gender parity index (GPIA)
+19279                                                                                                                              Total net attendance rate, upper secondary, urban, poorest quintile, adjusted gender parity index (GPIA)
+19283                                                                                                                               Total net attendance rate, upper secondary, urban, second quintile, adjusted gender parity index (GPIA)
+19287                                                                                                                               Total net attendance rate, upper secondary, urban, middle quintile, adjusted gender parity index (GPIA)
+19291                                                                                                                               Total net attendance rate, upper secondary, urban, fourth quintile, adjusted gender parity index (GPIA)
+19295                                                                                                                              Total net attendance rate, upper secondary, urban, richest quintile, adjusted gender parity index (GPIA)
+19301                                                                                                                      Adjusted net enrolment rate, one year before the official primary entry age, adjusted gender parity index (GPIA)
+19305                                                                                                                                                                          Total net enrolment rate, primary, gender parity index (GPI)
+19309                                                                                                                                                                  Total net enrolment rate, lower secondary, gender parity index (GPI)
+19313                                                                                                                                                                  Total net enrolment rate, upper secondary, gender parity index (GPI)
+19317                                                                                     Percentage of pupils enrolled in primary education who are at least 2 years over-age for their current grade, adjusted gender parity index (GPIA)
+19321                                                                     Percentage of pupils enrolled in lower secondary general education who are at least 2 years over-age for their current grade, adjusted gender parity index (GPIA)
+19346                                                                        Proportion of children aged 24-59 months who are developmentally on track in health, learning and psychosocial well-being, adjusted gender parity index (GPIA)
+19350                                                                                                                               Percentage of students experiencing bullying in the last 12 months, adjusted gender parity index (GPIA)
+19363                                                                                            Percentage of children under 5 years experiencing positive and stimulating home learning environments, adjusted gender parity index (GPIA)
+19378                                                                                 Participation rate of youth and adults in formal and non-formal education and training in the previous 12 months, adjusted gender parity index (GPIA)
+19392                                                                                                                                        Percentage of qualified teachers in pre-primary education, adjusted gender parity index (GPIA)
+19396                                                                                                                                            Percentage of qualified teachers in primary education, adjusted gender parity index (GPIA)
+19400                                                                                                                                    Percentage of qualified teachers in lower secondary education, adjusted gender parity index (GPIA)
+19404                                                                                                                                          Percentage of qualified teachers in secondary education, adjusted gender parity index (GPIA)
+19408                                                                                                                                    Percentage of qualified teachers in upper secondary education, adjusted gender parity index (GPIA)
+19463                                                                                                 Proportion of students in Grade 2 or 3 achieving at least a minimum proficiency level in reading, adjusted gender parity index (GPIA)
+19479                                                                                   Proportion of students at the end of lower secondary achieving at least a minimum proficiency level in reading, adjusted gender parity index (GPIA)
+19495                                                                                           Proportion of students at the end of primary achieving at least a minimum proficiency level in reading, adjusted gender parity index (GPIA)
+19553                                                                                                                                            Out-of-school rate for children of primary school age, adjusted gender parity index (GPIA)
+19557                                                                                                        Out-of-school rate for children and adolescents of primary and lower secondary school age, adjusted gender parity index (GPIA)
+19561                                                                                Out-of-school rate for children, adolescents and youth of primary, lower secondary and upper secondary school age, adjusted gender parity index (GPIA)
+19565                                                                                                                                 Out-of-school rate for adolescents of lower secondary school age, adjusted gender parity index (GPIA)
+19569                                                                                                             Out-of-school rate for adolescents and youth of lower and upper secondary school age, adjusted gender parity index (GPIA)
+19573                                                                                                                                       Out-of-school rate for youth of upper secondary school age, adjusted gender parity index (GPIA)
+19577                                                                                                                               Out-of-school rate for children one year younger than official age, adjusted gender parity index (GPIA)
+19583                                                                                                                    Out-of-school rate for children of primary school age, adjusted gender parity index (household survey data) (GPIA)
+19591                                                                                                  Out-of-school rate for children of primary school age, poorest quintile, adjusted gender parity index (household survey data) (GPIA)
+19598                                                                                                   Out-of-school rate for children of primary school age, second quintile, adjusted gender parity index (household survey data) (GPIA)
+19605                                                                                                   Out-of-school rate for children of primary school age, middle quintile, adjusted gender parity index (household survey data) (GPIA)
+19612                                                                                                   Out-of-school rate for children of primary school age, fourth quintile, adjusted gender parity index (household survey data) (GPIA)
+19619                                                                                                  Out-of-school rate for children of primary school age, richest quintile, adjusted gender parity index (household survey data) (GPIA)
+19626                                                                                                             Out-of-school rate for children of primary school age, rural, adjusted gender parity index (household survey data) (GPIA)
+19631                                                                        Out-of-school rate for children of primary school age, primary education, rural, poorest quintile, adjusted gender parity index (household survey data) (GPIA)
+19635                                                                         Out-of-school rate for children of primary school age, primary education, rural, second quintile, adjusted gender parity index (household survey data) (GPIA)
+19639                                                                         Out-of-school rate for children of primary school age, primary education, rural, middle quintile, adjusted gender parity index (household survey data) (GPIA)
+19643                                                                         Out-of-school rate for children of primary school age, primary education, rural, fourth quintile, adjusted gender parity index (household survey data) (GPIA)
+19647                                                                        Out-of-school rate for children of primary school age, primary education, rural, richest quintile, adjusted gender parity index (household survey data) (GPIA)
+19653                                                                                                             Out-of-school rate for children of primary school age, urban, adjusted gender parity index (household survey data) (GPIA)
+19658                                                                        Out-of-school rate for children of primary school age, primary education, urban, poorest quintile, adjusted gender parity index (household survey data) (GPIA)
+19662                                                                         Out-of-school rate for children of primary school age, primary education, urban, second quintile, adjusted gender parity index (household survey data) (GPIA)
+19666                                                                         Out-of-school rate for children of primary school age, primary education, urban, middle quintile, adjusted gender parity index (household survey data) (GPIA)
+19670                                                                         Out-of-school rate for children of primary school age, primary education, urban, fourth quintile, adjusted gender parity index (household survey data) (GPIA)
+19674                                                                        Out-of-school rate for children of primary school age, primary education, urban, richest quintile, adjusted gender parity index (household survey data) (GPIA)
+19682                                                                                                         Out-of-school rate for adolescents of lower secondary school age, adjusted gender parity index (household survey data) (GPIA)
+19690                                                                                       Out-of-school rate for adolescents of lower secondary school age, poorest quintile, adjusted gender parity index (household survey data) (GPIA)
+19697                                                                                        Out-of-school rate for adolescents of lower secondary school age, second quintile, adjusted gender parity index (household survey data) (GPIA)
+19704                                                                                        Out-of-school rate for adolescents of lower secondary school age, middle quintile, adjusted gender parity index (household survey data) (GPIA)
+19711                                                                                        Out-of-school rate for adolescents of lower secondary school age, fourth quintile, adjusted gender parity index (household survey data) (GPIA)
+19718                                                                                       Out-of-school rate for adolescents of lower secondary school age, richest quintile, adjusted gender parity index (household survey data) (GPIA)
+19725                                                                                                  Out-of-school rate for adolescents of lower secondary school age, rural, adjusted gender parity index (household survey data) (GPIA)
+19730                                                                                Out-of-school rate for adolescents of lower secondary school age, rural, poorest quintile, adjusted gender parity index (household survey data) (GPIA)
+19734                                                                                 Out-of-school rate for adolescents of lower secondary school age, rural, second quintile, adjusted gender parity index (household survey data) (GPIA)
+19738                                                                                 Out-of-school rate for adolescents of lower secondary school age, rural, middle quintile, adjusted gender parity index (household survey data) (GPIA)
+19742                                                                                 Out-of-school rate for adolescents of lower secondary school age, rural, fourth quintile, adjusted gender parity index (household survey data) (GPIA)
+19746                                                                                Out-of-school rate for adolescents of lower secondary school age, rural, richest quintile, adjusted gender parity index (household survey data) (GPIA)
+19752                                                                                                  Out-of-school rate for adolescents of lower secondary school age, urban, adjusted gender parity index (household survey data) (GPIA)
+19757                                                                                Out-of-school rate for adolescents of lower secondary school age, urban, poorest quintile, adjusted gender parity index (household survey data) (GPIA)
+19761                                                                                 Out-of-school rate for adolescents of lower secondary school age, urban, second quintile, adjusted gender parity index (household survey data) (GPIA)
+19765                                                                                 Out-of-school rate for adolescents of lower secondary school age, urban, middle quintile, adjusted gender parity index (household survey data) (GPIA)
+19769                                                                                 Out-of-school rate for adolescents of lower secondary school age, urban, fourth quintile, adjusted gender parity index (household survey data) (GPIA)
+19773                                                                                Out-of-school rate for adolescents of lower secondary school age, urban, richest quintile, adjusted gender parity index (household survey data) (GPIA)
+19781                                                                                                               Out-of-school rate for youth of upper secondary school age, adjusted gender parity index (household survey data) (GPIA)
+19789                                                                                             Out-of-school rate for youth of upper secondary school age, poorest quintile, adjusted gender parity index (household survey data) (GPIA)
+19796                                                                                              Out-of-school rate for youth of upper secondary school age, second quintile, adjusted gender parity index (household survey data) (GPIA)
+19803                                                                                              Out-of-school rate for youth of upper secondary school age, middle quintile, adjusted gender parity index (household survey data) (GPIA)
+19810                                                                                              Out-of-school rate for youth of upper secondary school age, fourth quintile, adjusted gender parity index (household survey data) (GPIA)
+19817                                                                                             Out-of-school rate for youth of upper secondary school age, richest quintile, adjusted gender parity index (household survey data) (GPIA)
+19824                                                                                                        Out-of-school rate for youth of upper secondary school age, rural, adjusted gender parity index (household survey data) (GPIA)
+19829                                                                                      Out-of-school rate for youth of upper secondary school age, rural, poorest quintile, adjusted gender parity index (household survey data) (GPIA)
+19833                                                                                       Out-of-school rate for youth of upper secondary school age, rural, second quintile, adjusted gender parity index (household survey data) (GPIA)
+19837                                                                                       Out-of-school rate for youth of upper secondary school age, rural, middle quintile, adjusted gender parity index (household survey data) (GPIA)
+19841                                                                                       Out-of-school rate for youth of upper secondary school age, rural, fourth quintile, adjusted gender parity index (household survey data) (GPIA)
+19845                                                                                      Out-of-school rate for youth of upper secondary school age, rural, richest quintile, adjusted gender parity index (household survey data) (GPIA)
+19851                                                                                                        Out-of-school rate for youth of upper secondary school age, urban, adjusted gender parity index (household survey data) (GPIA)
+19856                                                                                      Out-of-school rate for youth of upper secondary school age, urban, poorest quintile, adjusted gender parity index (household survey data) (GPIA)
+19860                                                                                       Out-of-school rate for youth of upper secondary school age, urban, second quintile, adjusted gender parity index (household survey data) (GPIA)
+19864                                                                                       Out-of-school rate for youth of upper secondary school age, urban, middle quintile, adjusted gender parity index (household survey data) (GPIA)
+19868                                                                                       Out-of-school rate for youth of upper secondary school age, urban, fourth quintile, adjusted gender parity index (household survey data) (GPIA)
+19872                                                                                      Out-of-school rate for youth of upper secondary school age, urban, richest quintile, adjusted gender parity index (household survey data) (GPIA)
+19925                                                                                                                                                                        School life expectancy, pre-primary, gender parity index (GPI)
+19929                                                                                                                                                                            School life expectancy, primary, gender parity index (GPI)
+19936                                                                                                                                                              School life expectancy, primary and secondary, gender parity index (GPI)
+19938                                                                                                                                                        School life expectancy, primary and lower secondary, gender parity index (GPI)
+19939                                                                                                                                                                School life expectancy, primary to tertiary, gender parity index (GPI)
+19942                                                                                                                                                                          School life expectancy, secondary, gender parity index (GPI)
+19946                                                                                                                                                        School life expectancy, post-secondary non-tertiary, gender parity index (GPI)
+19950                                                                                                                                                                           School life expectancy, tertiary, gender parity index (GPI)
+19954                                                                                                                                                              Survival rate to Grade 4 of primary education, gender parity index (GPI)
+19956                                                                                                                                                              Survival rate to Grade 5 of primary education, gender parity index (GPI)
+19957                                                                                                                                                       Survival rate to the last grade of primary education, gender parity index (GPI)
+19979                                                                                                                                                Teacher attrition rate from pre-primary education, adjusted gender parity index (GPIA)
+19982                                                                                                                                                    Teacher attrition rate from primary education, adjusted gender parity index (GPIA)
+19986                                                                                                                                            Teacher attrition rate from lower secondary education, adjusted gender parity index (GPIA)
+19991                                                                                                                                                  Teacher attrition rate from secondary education, adjusted gender parity index (GPIA)
+20000                                                                                                                                            Teacher attrition rate from upper secondary education, adjusted gender parity index (GPIA)
+20014                                                                                                         Proportion of teachers with the minimum required qualifications in pre-primary education, adjusted gender parity index (GPIA)
+20016                                                                                                             Proportion of teachers with the minimum required qualifications in primary education, adjusted gender parity index (GPIA)
+20019                                                                                                     Proportion of teachers with the minimum required qualifications in lower secondary education, adjusted gender parity index (GPIA)
+20021                                                                                                           Proportion of teachers with the minimum required qualifications in secondary education, adjusted gender parity index (GPIA)
+20024                                                                                                     Proportion of teachers with the minimum required qualifications in upper secondary education, adjusted gender parity index (GPIA)
+20143                                                                                           Proportion of population achieving at least a fixed level of proficiency in functional literacy skills, adjusted gender parity index (GPIA)
+20153                                                                                           Proportion of population achieving at least a fixed level of proficiency in functional numeracy skills, adjusted gender parity index (GPIA)</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>WDI<span class="sc">::</span><span class="fu">WDI</span>(<span class="at">country =</span> <span class="st">"MX"</span>,</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">indicator =</span> <span class="st">"SP.POP.TOTL"</span>,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">start =</span> <span class="dv">2000</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">end =</span> <span class="dv">2024</span>,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">extra =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">cache =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   country iso2c iso3c year SP.POP.TOTL
+1   Mexico    MX   MEX 2024          NA
+2   Mexico    MX   MEX 2023   129739759
+3   Mexico    MX   MEX 2022   128613117
+4   Mexico    MX   MEX 2021   127648148
+5   Mexico    MX   MEX 2020   126799054
+6   Mexico    MX   MEX 2019   125762982
+7   Mexico    MX   MEX 2018   124573711
+8   Mexico    MX   MEX 2017   123400057
+9   Mexico    MX   MEX 2016   122251351
+10  Mexico    MX   MEX 2015   121072306
+11  Mexico    MX   MEX 2014   119784261
+12  Mexico    MX   MEX 2013   118343573
+13  Mexico    MX   MEX 2012   116818208
+14  Mexico    MX   MEX 2011   115243504
+15  Mexico    MX   MEX 2010   113623895
+16  Mexico    MX   MEX 2009   111999721
+17  Mexico    MX   MEX 2008   110374288
+18  Mexico    MX   MEX 2007   108774360
+19  Mexico    MX   MEX 2006   107253666
+20  Mexico    MX   MEX 2005   105811504
+21  Mexico    MX   MEX 2004   104394131
+22  Mexico    MX   MEX 2003   102978515
+23  Mexico    MX   MEX 2002   101548624
+24  Mexico    MX   MEX 2001   100099099
+25  Mexico    MX   MEX 2000    98625552</code></pre>
+</div>
+</div>
+<p>Esta información la podemos guardar en un objeto. En este caso mejor pediremos un solo país:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>pop <span class="ot">&lt;-</span> WDI<span class="sc">::</span><span class="fu">WDI</span>(<span class="at">country =</span> <span class="st">"MX"</span>,</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">indicator =</span> <span class="st">"SP.POP.TOTL"</span>,</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">start =</span> <span class="dv">1990</span>,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">end =</span> <span class="dv">2023</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Vamos a revisar nuestro objeto:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(pop)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "data.frame"</code></pre>
+</div>
+</div>
+<p>Veamos y conozcamos la función <code>plot()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(pop<span class="sc">$</span>SP.POP.TOTL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="P1_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Este no es el mejor gráfico.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(pop<span class="sc">$</span>year, pop<span class="sc">$</span>SP.POP.TOTL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="P1_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Un gráfico con <code>{ggplot2}</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>pop <span class="sc">%&gt;%</span> </span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">x=</span>year, <span class="at">y=</span>SP.POP.TOTL) <span class="sc">+</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="P1_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="importación-de-datos" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="importación-de-datos"><span class="header-section-number">1.3</span> Importación de datos</h2>
+<section id="desde-excel" class="level3" data-number="1.3.1">
+<h3 data-number="1.3.1" class="anchored" data-anchor-id="desde-excel"><span class="header-section-number">1.3.1</span> Desde Excel</h3>
+<p>El paquete más compatible con RStudio es <code>{readxl}</code>. Como su nombre dice “lee” los archivos de excel</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>ejemploxl <span class="ot">&lt;-</span> readxl<span class="sc">::</span><span class="fu">read_excel</span>(<span class="st">"datos/0_Pob_Mitad_1950_2070.xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Como el nombre de paquete lo indica, sólo lee. Para “escribir” en este formato, recomiendo el paquete <code>{writexl}</code>. Lo instalamos anteriormente.</p>
+<p>Si quisiéramos exportar un objeto a Excel, se hace de la siguiente forma:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>writexl<span class="sc">::</span><span class="fu">write_xlsx</span>(ejemploxl, <span class="at">path =</span> <span class="st">"Mi_Exportación.xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="desde-archivos-de-texto-y-de-una-url" class="level3" data-number="1.3.2">
+<h3 data-number="1.3.2" class="anchored" data-anchor-id="desde-archivos-de-texto-y-de-una-url"><span class="header-section-number">1.3.2</span> Desde archivos de texto y de una url</h3>
+<p>Desde el portal <a href="https://conapo.segob.gob.mx/es/CONAPO/Datos_abiertos" class="uri">https://conapo.segob.gob.mx/es/CONAPO/Datos_abiertos</a> tenemos acceso a directo a varias fuentes de información, al ser datos abiertos, los archivos de texto son muy comunes.</p>
+<p>Leeremos parte de esa información, específicamente las proyecciones de población, pero hoy directamente desde este sitio y con formato de texto</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>pry23 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://conapo.segob.gob.mx/work/models/CONAPO/Datos_Abiertos/pry23/00_Pob_Mitad_1950_2070.csv"</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(pry23)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "RENGLON"   "AÑO"       "ENTIDAD"   "CVE_GEO"   "EDAD"      "SEXO"     
+[7] "POBLACION"</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>pry23 <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="st">"https://conapo.segob.gob.mx/work/models/CONAPO/Datos_Abiertos/pry23/00_Pob_Mitad_1950_2070.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 737660 Columns: 7
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (2): ENTIDAD, SEXO
+dbl (5): RENGLON, AÑO, CVE_GEO, EDAD, POBLACION
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(pry23)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "RENGLON"   "AÑO"       "ENTIDAD"   "CVE_GEO"   "EDAD"      "SEXO"     
+[7] "POBLACION"</code></pre>
+</div>
+</div>
+</section>
+<section id="wpp2024" class="level3" data-number="1.3.3">
+<h3 data-number="1.3.3" class="anchored" data-anchor-id="wpp2024"><span class="header-section-number">1.3.3</span> <code>{wpp2024}</code></h3>
+<p>Vamos a utilizar datos del paquete <code>{wpp2024}</code>. Revisemos la viñeta del paquete que está <a href="https://github.com/PPgp/wpp2024">aquí</a></p>
+<p>Muy importante</p>
+<blockquote class="blockquote">
+<p>Caution: All annual population datasets are considered to depict population to December 31 (midnight) of each year. This is different from the official WPP release, which treats population at January 1 (0h). Thus, the population numbers in this package are shifted by one year when compared to the official UN data. E.g., population in year 2050 in the R package corresponds to 2051 in the UN data. Vital rates and counts at time t refer to the calendar year t, so that they yield population at time t in this R package.</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>The 5-year datasets are created in legacy WPP 5-year periods so that vital rates observed/projected from July 1 of year t to June 31 of year t+5 correspond to population at July 1 of year t+5. E.g. population in 2055 in a 5x5 dataset corresponds to vital rates/counts aggregated over 2050.5-2054.49. Since the 5x5 population is considered to July 1st, it corresponds to the interpolated values between year t and year t+1 in the annual 1x1 dataset.</p>
+</blockquote>
+<p>Todas los <em>data.frames</em> están en el paquete y si lo tenemos cargados podemos consultarlo con el comando data()</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"popAge5dt"</span>) </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"popprojAge5dt"</span>)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"popAge1dt"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Aquí están todos los países, revisemos un poco</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>popAge5dt <span class="sc">%&gt;%</span> </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(country_code, name) <span class="sc">%&gt;%</span> </span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unique</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     country_code                             name
+            &lt;int&gt;                           &lt;char&gt;
+  1:          900                            World
+  2:         1834               Sub-Saharan Africa
+  3:         1833 Northern Africa and Western Asia
+  4:         1831        Central and Southern Asia
+  5:         1832   Eastern and South-Eastern Asia
+ ---                                              
+293:          882                            Samoa
+294:          772                          Tokelau
+295:          776                            Tonga
+296:          798                           Tuvalu
+297:          876        Wallis and Futuna Islands</code></pre>
+</div>
+</div>
+<p>Podemos hacer búsquedas:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>popAge5dt <span class="sc">%&gt;%</span> </span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mx=</span>stringr<span class="sc">::</span><span class="fu">str_detect</span>(name, <span class="st">"Mex"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(mx) <span class="sc">%&gt;%</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(country_code, name) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     country_code   name
+            &lt;int&gt; &lt;char&gt;
+  1:          484 Mexico
+  2:          484 Mexico
+  3:          484 Mexico
+  4:          484 Mexico
+  5:          484 Mexico
+ ---                    
+311:          484 Mexico
+312:          484 Mexico
+313:          484 Mexico
+314:          484 Mexico
+315:          484 Mexico</code></pre>
+</div>
+</div>
+<p>Vamos a hacer el ejercicio con México pero pueden buscar cualquier otro país y la región</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Países: </span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="co"># uy: 858</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="co"># sv: 222 </span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="co"># gt: 320</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="co"># hn: 340</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="co"># mx: 484</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="co"># CA: 916</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a><span class="co"># LAC: 1830</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>popAge1dt<span class="ot">&lt;-</span> popAge1dt <span class="sc">%&gt;%</span> </span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(country_code<span class="sc">%in%</span><span class="fu">c</span>(<span class="dv">484</span>,<span class="dv">1830</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>También, tengo datos de algunos censos, descargados de ipums</p>
+</section>
+</section>
+<section id="de-ipums" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="de-ipums"><span class="header-section-number">1.4</span> De IPUMS</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>readxl<span class="sc">::</span><span class="fu">read_excel</span>(<span class="st">"datos/censos_p2.xlsx"</span>, </span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">sheet =</span> <span class="st">"El Salvador 1992"</span> ) <span class="sc">%&gt;%</span> <span class="co">#ojo con este argumento</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  janitor<span class="sc">::</span><span class="fu">clean_names</span>() <span class="co"># checa qué hace</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+  age    male female unknown
+  &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;
+1 0      6093   6113       0
+2 1      6089   5795       0
+3 2      6805   6737       0
+4 3      7028   6699       0
+5 4      7294   6965       0
+6 5      6628   6408       0</code></pre>
+</div>
+</div>
+<p>Usaremos esta tabla de datos agregados para <strong>crear variables</strong>. Esto se hace con el comando <code>dplyr::mutate()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>sv1992<span class="ot">&lt;-</span>readxl<span class="sc">::</span><span class="fu">read_excel</span>(<span class="st">"datos/censos_p2.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"El Salvador 1992"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  janitor<span class="sc">::</span><span class="fu">clean_names</span>() <span class="sc">%&gt;%</span> <span class="co">#</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">total=</span>male <span class="sc">+</span> female) <span class="sc">%&gt;%</span> <span class="co"># ojo</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">age=</span><span class="fu">as.numeric</span>(age)) <span class="co">#ojo</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="fmsb-atracción-digital" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="fmsb-atracción-digital"><span class="header-section-number">1.5</span> <code>{fmsb}</code> Atracción digital</h2>
+<p>Este paquete tiene cosas muy interesantes. Es un paquete no sólo para demografía pero permite ajustar algunas funciones demográficas</p>
+<p><strong>Limitantes:</strong> como que está en japonés :P</p>
+<p>Un ejemplo con el índice de Whipple, que mide la atracción digital. Necesitamos datos en edades singulares:</p>
+<p>Tenemos un archivo en datos con varios censos, para evaluar su información a través de la atracción digital. Revisemos los datos del censo de 1992.</p>
+<p>Para ver los totales podemos agregar una fila muy simple con <code>janitor::adorn_totals(where="row")</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>sv1992 <span class="sc">%&gt;%</span> </span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  janitor<span class="sc">::</span><span class="fu">adorn_totals</span>(<span class="at">where=</span><span class="st">"row"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   age   male female unknown  total
+     0   6093   6113       0  12206
+     1   6089   5795       0  11884
+     2   6805   6737       0  13542
+     3   7028   6699       0  13727
+     4   7294   6965       0  14259
+     5   6628   6408       0  13036
+     6   6906   6570       0  13476
+     7   7012   6350       0  13362
+     8   6444   6232       0  12676
+     9   6086   5884       0  11970
+    10   7012   6690       0  13702
+    11   6394   6067       0  12461
+    12   7955   7415       0  15370
+    13   6482   6175       0  12657
+    14   6654   6622       0  13276
+    15   6617   6717       0  13334
+    16   5872   5985       0  11857
+    17   5891   6089       0  11980
+    18   6073   6274       0  12347
+    19   4356   4999       0   9355
+    20   5205   5950       0  11155
+    21   3812   4526       0   8338
+    22   4997   5645       0  10642
+    23   4177   4875       0   9052
+    24   4195   4875       0   9070
+    25   4045   4922       0   8967
+    26   3816   4453       0   8269
+    27   3598   4160       0   7758
+    28   3657   4254       0   7911
+    29   3023   3341       0   6364
+    30   4533   4886       0   9419
+    31   2139   2612       0   4751
+    32   3490   4025       0   7515
+    33   2599   3024       0   5623
+    34   2368   2765       0   5133
+    35   2996   3456       0   6452
+    36   2590   2859       0   5449
+    37   2325   2667       0   4992
+    38   2627   2936       0   5563
+    39   1985   2217       0   4202
+    40   3352   3548       0   6900
+    41   1433   1649       0   3082
+    42   2851   3003       0   5854
+    43   1691   1962       0   3653
+    44   1576   1763       0   3339
+    45   2329   2497       0   4826
+    46   1490   1760       0   3250
+    47   1716   1811       0   3527
+    48   1807   2105       0   3912
+    49   1276   1392       0   2668
+    50   2319   2597       0   4916
+    51    986   1151       0   2137
+    52   1901   2067       0   3968
+    53   1196   1470       0   2666
+    54   1198   1456       0   2654
+    55   1561   1781       0   3342
+    56   1215   1401       0   2616
+    57   1078   1238       0   2316
+    58   1110   1291       0   2401
+    59    824    943       0   1767
+    60   2020   2242       0   4262
+    61    601    779       0   1380
+    62   1358   1453       0   2811
+    63    876   1007       0   1883
+    64    860    952       0   1812
+    65   1211   1347       0   2558
+    66    799    931       0   1730
+    67    755    937       0   1692
+    68    779    905       0   1684
+    69    514    554       0   1068
+    70   1212   1276       0   2488
+    71    371    438       0    809
+    72    747    923       0   1670
+    73    472    562       0   1034
+    74    453    480       0    933
+    75    649    777       0   1426
+    76    385    472       0    857
+    77    350    378       0    728
+    78    410    533       0    943
+    79    240    274       0    514
+    80    501    657       0   1158
+    81    178    239       0    417
+    82    328    390       0    718
+    83    164    225       0    389
+    84    148    187       0    335
+    85    210    294       0    504
+    86    146    202       0    348
+    87    110    152       0    262
+    88    124    155       0    279
+    89     93    111       0    204
+    90    110    155       0    265
+    91     47     53       0    100
+    92     67     98       0    165
+    93     23     41       0     64
+    94     14     27       0     41
+    95     17     44       0     61
+    96     16     36       0     52
+    97     10     19       0     29
+    98     71    120       0    191
+    99      0      0       0      0
+   100      0      0       0      0
+   999      0      0       0      0
+ Total 248216 262544       0 510760</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>sv1992<span class="ot">&lt;-</span>readxl<span class="sc">::</span><span class="fu">read_excel</span>(<span class="st">"datos/censos_p2.xlsx"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  janitor<span class="sc">::</span><span class="fu">clean_names</span>() <span class="sc">%&gt;%</span> <span class="co">#</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">total=</span> male <span class="sc">+</span> female) <span class="sc">%&gt;%</span> </span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">age=</span><span class="fu">as.numeric</span>(age))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>El índice de Whipple</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>sv1992 <span class="sc">%&gt;%</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span>age<span class="sc">&gt;</span><span class="dv">64</span>) <span class="sc">%&gt;%</span> <span class="co"># Este filtro es importante</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">count</span>(age, <span class="at">wt=</span>total) <span class="sc">%&gt;%</span>  <span class="co"># necesitamos siempre una tabla que se ve así</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 2
+    age     n
+  &lt;dbl&gt; &lt;dbl&gt;
+1     0 67733
+2     1 66507
+3     2 66977
+4     3 64758
+5     4 65412
+6     5 67617</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>sv1992 <span class="sc">%&gt;%</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span>age<span class="sc">&gt;</span><span class="dv">64</span>) <span class="sc">%&gt;%</span> <span class="co"># Este filtro es importante</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">count</span>(age, <span class="at">wt=</span>male) <span class="sc">%&gt;%</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a> <span class="fu">with</span>(</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>    fmsb<span class="sc">::</span><span class="fu">WhipplesIndex</span>(n) <span class="co"># se llama n por la segunda columa de la tabla anterior</span></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$WI
+[1] 102.4858
+
+$JUDGE
+[1] "highly accurate"</code></pre>
+</div>
+</div>
+<section id="momento-de-práctica" class="level3" data-number="1.5.1">
+<h3 data-number="1.5.1" class="anchored" data-anchor-id="momento-de-práctica"><span class="header-section-number">1.5.1</span> Momento de práctica</h3>
+<p>Importa cualquier otro censo y encuentra el índice de Whipple</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./index.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Sobre el curso</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./P2.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Evaluación de información y pirámides</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>
